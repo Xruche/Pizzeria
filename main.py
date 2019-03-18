@@ -15,10 +15,10 @@ import os
 
 
 
-	# Inicialitació dels valors de les variables
+						# Inicialitació dels valors de les variables
 
-cuiners = 5				## Nombre total de cuiners
-repartidors = 5			## Nombre total de repartidors
+cuiners = 6				## Nombre total de cuiners
+repartidors = 10		## Nombre total de repartidors
 
 
 cll = cuiners			## Nombre de cuiners lliures
@@ -28,7 +28,7 @@ pef = 0					## Nombre de pizzes esperant entrar al forn
 rll = repartidors		## Nombre de repartidors lliures
 per = 0 				## Nombre de pizzes esperant repartirment
 
-Pizzes_comanda = []
+Pizzes_comanda = []		##Llista on s'emmagatzema el nombre de pizzes de la comanda i el temps de generació de comanda
 
 	## Variables de control:
 
@@ -41,11 +41,10 @@ llista = classes.llista_esdeveniments() 	## Objecte encarregat de gestionar els 
 
 ncomandes = 0			## Nombre de comandes realitzades
 
-temps_espera = [] 		## Llista on s'emmagatzemen els valors de temps de processament per a cada comanda
+temps_proces = [] 		## Llista on s'emmagatzemen els valors de temps de processament per a cada comanda
 
 treballadors = []		## LLista on s'emmagatzemen per a cada instant de temps de la simulació (temps, nombre de cuiners lliures, nombre de repartidors lliures) per calcular el temps treballat total
 
-temps_warm_up = 0
 
 	## Per iniciar la simulació s'introdueix una comanda a l'instant t = 0 que desencadena els esdeveniments següents
 
@@ -70,7 +69,7 @@ def simular():
 	global Time
 	global tot
 	global ncomandes
-	global temps_espera_accumulat
+	global temps_proces
 	global t
 	global treballadors
 
@@ -81,7 +80,9 @@ def simular():
 
 	while (t < limit_temps):
 
-		esdev_buffer = llista.esdeveniments_següents()  ## Emmagatzemem els esdeveniments a realitzar en el següent instant de temps
+		## Emmagatzemem els esdeveniments a realitzar en el següent instant de temps
+
+		esdev_buffer = llista.esdeveniments_següents()
 
 		## Processem els esdeveniments al buffer
 
@@ -136,7 +137,7 @@ def simular():
 				if rll > 0 and per >= Pizzes_comanda[0][0]:
 					per = per - Pizzes_comanda[0][0]
 					durada_repartiment =utils.Truncar_normal(10,40,25,10)
-					temps_espera.append((t-Pizzes_comanda[0][1])+durada_repartiment/2)
+					temps_proces.append((t-Pizzes_comanda[0][1])+durada_repartiment/2)
 					Pizzes_comanda.pop(0)
 					llista.afegeix (t + durada_repartiment, "FR")
 					rll = rll - 1
@@ -148,7 +149,7 @@ def simular():
 					if per > Pizzes_comanda[0][0]:
 						per = per - Pizzes_comanda[0][0]
 						durada_repartiment =utils.Truncar_normal(10,40,25,10) 
-						temps_espera.append((t-Pizzes_comanda[0][1])+durada_repartiment/2)
+						temps_proces.append((t-Pizzes_comanda[0][1])+durada_repartiment/2)
 						llista.afegeix (t + durada_repartiment, "FR")
 						Pizzes_comanda.pop(0)
 					else:
@@ -156,26 +157,34 @@ def simular():
 				else:
 					rll = rll + 1	
 
+		## S'emmagatzema la quantitat de treballadors lliures en cada instant de simulació en tuples (temps, cuiners lliures, repartidors lliures)
+
 		treballadors.append((t,cll,rll))
+
 		## Un cop tenim computades totes les variables d'estat i els nous esdeveniments, obtenim el temps del esdeveniment més proper
+		
 		t = llista.next_time()
 
-def calcularmu (llista):
-	acumulat = 0
-	for element in llista:
-		acumulat = acumulat + element
-	return acumulat/len(llista)
 
 def escriure_a_fitxer ():
+
+	## Funció generadora de fitxer resultats.csv amb els temps de processament per a cada comanda per l'anàlisi en MiniTab
+
 	with open('resultats.csv', 'w') as f:
 		data = "Nombre de comanda;Temps de processament\n"
 		f.write (data)
-		for i in range(0,len(temps_espera)):
-			data = str(i)+";"+str(temps_espera[i])+"\n"
+		for i in range(0,len(temps_proces)):
+			data = str(i)+";"+str(temps_proces[i])+"\n"
 			f.write(data.replace('.',','))
 
+
+
+
 def resultats():
-	print("Mitjana de temps de processament : "+str(sum(temps_espera)/len(temps_espera))+"h")
+
+	## Impressió dels resultats per pantalla, dona el temps mitjà de processament (en transitori i permanent conjuntament), el temps d'aturada i la ocupació dels treballadors
+
+	print("Mitjana de temps de processament : "+str(sum(temps_proces)/len(temps_proces))+"min")
 	print("")
 	print("temps d'aturada : "+str(t/60))
 	hores_treballades_cuiners = 0;
@@ -183,6 +192,7 @@ def resultats():
 	for i in range (0,len(treballadors)-1):
 		hores_treballades_cuiners = hores_treballades_cuiners + (cuiners-treballadors[i][1])*(treballadors[i+1][0]-treballadors[i][0])
 		hores_treballades_repartidors = hores_treballades_repartidors + (repartidors-treballadors[i][2])*(treballadors[i+1][0]-treballadors[i][0])
+
 	print("Proporció de temps en treball per als cuiners : "+str(hores_treballades_cuiners/(cuiners*t))+"%")
 	print("Proporció de temps en treball per als repartidors : "+str(hores_treballades_repartidors/(repartidors*t))+"%")
 	escriure_a_fitxer()

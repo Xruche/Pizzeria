@@ -19,6 +19,8 @@ def Exponencial (lamb):
 	return (-math.log(random.random())/lamb)
 
 def Truncar_normal (a,b, mu, sigma):
+	## Genera un nombre aleatori en Normal truncada amb els parametres especificats
+
 	value = Normal(mu, sigma)
 	
 	while (a > value or b < value):
@@ -27,6 +29,8 @@ def Truncar_normal (a,b, mu, sigma):
 	return value
 
 def nombre_pizzes ():
+	## Generador del nombre de pizzes per cada comanda mitjançant la llei especificada
+
 	prob = [(0.05,1),(0.4,2),(0.25,3),(0.20,4), (0.10,5)]
 	x = random.random()
 	acumulada = 0
@@ -36,6 +40,8 @@ def nombre_pizzes ():
 			return element[1]
 
 def test_distribucions (n,a,b,mu,sigma,lamb):
+	## Genera un fitxer test_distribucions.csv amb el qual es poden comprovar els generadors de nombres aleatoris amb MiniTab
+
 	with open('test_distribucions.csv', 'w') as f:
 		data = "Uniforme ("+str(a)+","+str(b)+");Normal("+str(mu)+","+str(sigma)+");Exponencial ("+str(lamb)+");Discreta ;Normal truncada (10,40)\n"
 		f.write (data.replace('.',','))
@@ -43,3 +49,11 @@ def test_distribucions (n,a,b,mu,sigma,lamb):
 			data = str(Uniforme(a,b))+";"+str(Normal(mu,sigma))+";"+str(Exponencial(lamb))+";"+str(nombre_pizzes())+";"+str(Truncar_normal(10,40,25,10))+";\n"
 			f.write(data.replace('.',','))
 	return
+
+def calcularmu (llista):
+	## Funció per calcular mitjanes de llistes
+
+	acumulat = 0
+	for element in llista:
+		acumulat = acumulat + element
+	return acumulat/len(llista)

@@ -1,3 +1,6 @@
+
+## Classe usada com a contenidor dels esdeveniments futurs de la simulació, és la llista d'esdeveniments
+
 class llista_esdeveniments:
 	##Llista on s'emmagatzemen els esdeveniments
 	esdeveniments = []
