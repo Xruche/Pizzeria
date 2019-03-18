@@ -166,9 +166,15 @@ def calcularmu (llista):
 		acumulat = acumulat + element
 	return acumulat/len(llista)
 
+def escriure_a_fitxer ():
+	with open('resultats.csv', 'w') as f:
+		data = "Nombre de comanda;Temps de processament\n"
+		f.write (data)
+		for i in range(0,len(temps_espera)):
+			data = str(i)+";"+str(temps_espera[i])+"\n"
+			f.write(data.replace('.',','))
 
 def resultats():
-	global ncomandes
 	print("Mitjana de temps de processament : "+str(sum(temps_espera)/len(temps_espera))+"h")
 	print("")
 	print("temps d'aturada : "+str(t/60))
@@ -179,6 +185,7 @@ def resultats():
 		hores_treballades_repartidors = hores_treballades_repartidors + (repartidors-treballadors[i][2])*(treballadors[i+1][0]-treballadors[i][0])
 	print("Proporció de temps en treball per als cuiners : "+str(hores_treballades_cuiners/(cuiners*t))+"%")
 	print("Proporció de temps en treball per als repartidors : "+str(hores_treballades_repartidors/(repartidors*t))+"%")
+	escriure_a_fitxer()
 	
 
 simular()
