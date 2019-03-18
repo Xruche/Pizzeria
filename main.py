@@ -17,8 +17,8 @@ import os
 
 						# Inicialitació dels valors de les variables
 
-cuiners = 6				## Nombre total de cuiners
-repartidors = 10		## Nombre total de repartidors
+cuiners = 5				## Nombre total de cuiners
+repartidors = 9			## Nombre total de repartidors
 
 
 cll = cuiners			## Nombre de cuiners lliures
@@ -33,7 +33,7 @@ Pizzes_comanda = []		##Llista on s'emmagatzema el nombre de pizzes de la comanda
 	## Variables de control:
 
 t = 0										## Instant actual de la simulació
-limit_temps = 12*60							## Valor de temps per sobre el qual la simulació no genera noves comandes (minuts)
+limit_temps = 50*60							## Valor de temps per sobre el qual la simulació no genera noves comandes (minuts)
 llista = classes.llista_esdeveniments() 	## Objecte encarregat de gestionar els esdeveniments
 
 	## Comptadors estadístics:
@@ -193,8 +193,8 @@ def resultats():
 		hores_treballades_cuiners = hores_treballades_cuiners + (cuiners-treballadors[i][1])*(treballadors[i+1][0]-treballadors[i][0])
 		hores_treballades_repartidors = hores_treballades_repartidors + (repartidors-treballadors[i][2])*(treballadors[i+1][0]-treballadors[i][0])
 
-	print("Proporció de temps en treball per als cuiners : "+str(hores_treballades_cuiners/(cuiners*t))+"%")
-	print("Proporció de temps en treball per als repartidors : "+str(hores_treballades_repartidors/(repartidors*t))+"%")
+	print("Proporció de temps en treball per als cuiners : "+str(100*hores_treballades_cuiners/(cuiners*t))+"%")
+	print("Proporció de temps en treball per als repartidors : "+str(100*hores_treballades_repartidors/(repartidors*t))+"%")
 	escriure_a_fitxer()
 	
 
