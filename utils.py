@@ -43,7 +43,7 @@ def test_distribucions (n,a,b,mu,sigma,lamb):
 	## Genera un fitxer test_distribucions.csv amb el qual es poden comprovar els generadors de nombres aleatoris amb MiniTab
 
 	with open('test_distribucions.csv', 'w') as f:
-		data = "Uniforme ("+str(a)+","+str(b)+");Normal("+str(mu)+","+str(sigma)+");Exponencial ("+str(lamb)+");Discreta ;Normal truncada (10,40)\n"
+		data = "Uniforme ("+str(a)+","+str(b)+");Normal("+str(mu)+","+str(sigma)+");Exponencial ("+str(lamb)+");Discreta ;Normal truncada ("+str(a)+","+str(b)+")\n"
 		f.write (data.replace('.',','))
 		for i in range(0,n):
 			data = str(Uniforme(a,b))+";"+str(Normal(mu,sigma))+";"+str(Exponencial(lamb))+";"+str(nombre_pizzes())+";"+str(Truncar_normal(10,40,25,10))+";\n"

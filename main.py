@@ -15,8 +15,8 @@ import os
 
 						# Inicialitació dels valors de les variables
 
-cuiners = 5				## Nombre total de cuiners
-repartidors = 9			## Nombre total de repartidors
+cuiners = 9				## Nombre total de cuiners
+repartidors = 5			## Nombre total de repartidors
 
 
 
@@ -214,42 +214,72 @@ def inicialitzar_variables ():
 def escriure_a_fitxer (vector_dades):
 
 	## Funció generadora de fitxer resultats.csv amb els temps de processament per a cada comanda per l'anàlisi en MiniTab
-
+	vector_dades = vector_dades[0]
 	with open('resultats.csv', 'w') as f:
-		data = "Nombre de comanda;Temps de processament\n"
+		data = ""
+		for i in range(0, len(vector_dades)):
+			data = data + "Nombre de comanda;Temps de processament;;"
+		data = data[:-2]+"\n"
 		f.write (data)
-		for i in range(0,len(Tme)):
-			data = str(i)+";"+str(Tme[i])+"\n"
+		for i in range(0,len(vector_dades[0])):
+			data = ""
+			for j in range(0,len(vector_dades)):
+				data = data + str(i)+";"+str(vector_dades[j][i])+";;"
+			data = data[:-2]+"\n"
 			f.write(data.replace('.',','))
 
 
 def resultats(vector_dades):
 
 	## Impressió dels resultats per pantalla, dona el temps mitjà de processament (en transitori i permanent conjuntament), el temps d'aturada i la ocupació dels treballadors
+	
+	## Calcul de la mitjana del temps de processament:
 
-	print("Mitjana de temps de processament : "+str(sum(Tme)/len(Tme))+"min")
+	suma = 0					# Suma de tots els temps de processament		
+	num_mostres = 0				# Nombre de mostres obtingudes
+	sum_quad = 0				# Suma dels quadrats dels temps de processament (per fer la desv. estandard)
+
+	for element in vector_dades[0]:
+		for nombre in element:
+			num_mostres += 1
+			suma = suma + nombre
+			sum_quad = sum_quad + (nombre*nombre)
+
+	mitjana = suma / num_mostres
+	desv = math.sqrt((1/(num_mostres-1))*(sum_quad-(suma*suma)/num_mostres))
+
+	print("Mitjana de temps de processament : "+str(mitjana)+" min")
 	print("")
-	print("temps d'aturada : "+str(t/60))
+	print("Desviació estàndard del temps de processament : "+str(desv))
+
+	## Calcul de les taxes d'ocupació dels treballadors
+
 	hores_treballades_cuiners = 0;
 	hores_treballades_repartidors = 0;
-	for i in range (0,len(treballadors)-1):
-		hores_treballades_cuiners = hores_treballades_cuiners + (cuiners-treballadors[i][1])*(treballadors[i+1][0]-treballadors[i][0])
-		hores_treballades_repartidors = hores_treballades_repartidors + (repartidors-treballadors[i][2])*(treballadors[i+1][0]-treballadors[i][0])
 
-	print("Proporció de temps en treball per als cuiners : "+str(100*hores_treballades_cuiners/(cuiners*(t-treballadors[0][0])))+"%")
-	print("Proporció de temps en treball per als repartidors : "+str(100*hores_treballades_repartidors/(repartidors*(t-treballadors[0][0])))+"%")
-	escriure_a_fitxer()
+	hores_totals_jornada = 0;
+
+	for element in vector_dades[1]:
+		for i in range(0, len(element)-1):
+			hores_treballades_cuiners += (cuiners-element[i][1])*(element[i+1][0]-element[i][0])
+			hores_treballades_repartidors += (repartidors-element[i][2])*(element[i+1][0]-element[i][0])
+
+		hores_totals_jornada += (element[len(element)-1][0]-element[0][0])
+
+	print("Proporció de temps en treball per als cuiners : "+str(100*hores_treballades_cuiners/(cuiners*hores_totals_jornada))+"%")
+	print("Proporció de temps en treball per als repartidors : "+str(100*hores_treballades_repartidors/(repartidors*hores_totals_jornada))+"%")
 	
 
-
-def simular(nombre_simulacions, nombre_mostres_warm_up, nombre_mostres):
+def simular(nombre_simulacions, nombre_mostres, nombre_mostres_warm_up):
 	## Funció que permet realitzar múltiples simulacions amb un determinat nombre de mostres i descartant un cer nombre de mostres de warm_up
 	
-	dades = [] 		## S'inicialitza el vector on guadarem totes les dades de cada simulació com a una tupla per a cada simulació on la primera dada es el vector de Tme i el segon el vector treballadors.
+	Tmes = [] 		## S'inicialitza el vector on guadarem totes les dades de cada simulació dels vector de Tme.
+	taxes = []		## S'inicialitza el vector on guradem totes les dades de cada simulació referents a les ocupacions dels treballadors.
 
 	for i in range (0,nombre_simulacions):
 		inicialitzar_variables()
 		simulacio(nombre_mostres, nombre_mostres_warm_up)
-		dades.append((Tme, treballadors))
+		Tmes.append(Tme)
+		taxes.append(treballadors)
 
-	return dades
+	return Tmes,taxes
