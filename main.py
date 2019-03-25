@@ -283,3 +283,6 @@ def simular(nombre_simulacions, nombre_mostres, nombre_mostres_warm_up):
 		taxes.append(treballadors)
 
 	return Tmes,taxes
+
+d = simular(20,200,300)
+resultats(d)
