@@ -15,8 +15,8 @@ import os
 
 						# Inicialitació dels valors de les variables
 
-cuiners = 9				## Nombre total de cuiners
-repartidors = 5			## Nombre total de repartidors
+cuiners = 7				## Nombre total de cuiners
+repartidors = 11		## Nombre total de repartidors
 
 
 
